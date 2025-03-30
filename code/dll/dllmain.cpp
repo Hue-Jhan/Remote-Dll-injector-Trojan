@@ -1,0 +1,20 @@
+#include "pch.h"
+#include <windows.h>
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
+    switch (ul_reason_for_call) {
+    case DLL_PROCESS_ATTACH:
+        MessageBoxA(NULL, "dll attached xD", "WARNING", MB_ICONEXCLAMATION); // ... actual shell...
+        break;
+    case DLL_PROCESS_DETACH:
+        MessageBoxA(NULL, "dll detached Dx", "WARNING", MB_ICONEXCLAMATION);
+        break;
+    case DLL_THREAD_ATTACH:
+        MessageBoxA(NULL, "Thread created xd", "WARNING", MB_ICONEXCLAMATION);
+        break;
+    case DLL_THREAD_DETACH:
+        MessageBoxA(NULL, "Thread ended Dx", "WARNING", MB_ICONEXCLAMATION);
+        break;
+    }
+    return TRUE;
+}
