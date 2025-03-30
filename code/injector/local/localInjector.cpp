@@ -3,7 +3,7 @@
 
 DWORD WINAPI threadFunc(LPVOID lpParam) {
 	printf("Thread is running...\n");
-  // ...
+ 	// ...
 	return 0;
 }
 
@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-  WaitForSingleObject(hThread, INFINITE);
+	WaitForSingleObject(hThread, INFINITE);
 	CloseHandle(hThread);
 	FreeLibrary(hDll);
 
