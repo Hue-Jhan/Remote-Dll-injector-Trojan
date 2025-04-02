@@ -22,22 +22,21 @@ This malware injects a malicious library into a target process or directly creat
 - Then we convert it into its hexadecimal string representation and we get the final encrypted shellcode.
 
 ### 1) DLL
-The malicious library contains 4 different call cases, process attach/detach, and thread create/delete, the best one is in my opinion the first one. When the library is attached to the process, it decodes the base64 encoded data and uploads it to memory. Once uploaded, the data holding the shellcode will start the reverse shell with the attacker machine.  
+The malicious library contains 4 different call cases, process attach/detach, and thread create/delete, the best one is in my opinion the first one. When the library is attached to the process, it runs arbitrary code, in the sample there is a simple windows message box, in the actual dll the code decodes base64 encoded data and uploads the shellcode containing the reverse shell to memory. You can create a dll on Visual Studio by making a new project and selecting the dll template, also rememeber to build both the dll and the injector in release mode and in the same architecture.
 
 ### 2) Local Injection
 
 The local injection takes the dynamic library which is already located into the disk (basically useless, just a sample), creates a process and injects the library into it. Here is a detailed explanation: 
 
-- aaa
-- bbb
-- ccc
+- First we locate the dll and we load it into the same process that runs it; 
+- Then we create a thread and execute whatever we want, for example calling a function from inside the dll or running multiple tasks;
 
 ### 3) Remote Injection
 
 The remote injection dumps the dynamic library into disk (might get detected tho as anything that gets written into disk is automathically scanned by the antivirus), looks for a specific process and injects the library into it. Here is a detailed explanation: 
 
-- aaa 
-- bbb
+- First of all we put the malicious dll in the same folder as the injector, we create a resource file and its header and we set the dll as a resource of the injector;
+- Secondly on the injector we locate the resource file, calculate its size, and upload it;
 - ccc
 
 
