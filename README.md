@@ -31,20 +31,25 @@ The local injection takes the dynamic library which is already located into the 
 - First we locate the dll and we load it into the same process that runs it; 
 - Then we create a thread and execute whatever we want, for example calling a function from inside the dll or running multiple tasks;
 
-### 3) Remote Injection
+Because our dll is executed by the main function of our process, the thread isn't mandatory, you can use it for example to call a function from the dll if it needs to run in the background or loop continuously. 
+
+### 2.1) Remote Injection
 
 The remote injection dumps the dynamic library into disk (might get detected tho as anything that gets written into disk is automathically scanned by the antivirus), looks for a specific process and injects the library into it. Here is a detailed explanation: 
 
 - First of all we put the malicious dll in the same folder as the injector, we create a resource file and its header and we set the dll as a resource of the injector;
-- Secondly on the injector we locate the resource file, calculate its size, and upload it;
-- ccc
+- Secondly on the injector we locate the resource file, calculate its size, upload it to memory, and lock it for access so it can be used without being moved;
+- Thirdly we extract the dll from the executable and write it to disk;
+- We find a process by PID, allocate memory the size of the dll path inside of it and write the path into the process;
+- Then we get the base address of kernel32 dll to get the pointer of the function which will load the malicious library;
+- Finally we create a thread that executes the function that loads the malicious dll;
 
 
 # 🛡 Obfuscation and AV Detection 
 
 <img align="right" src="media/av1.png" width="340" />
 
-Both codes are undetected by Windows defender, but the local injection is detected by 10 antiviruses. Using a simple certificate and metadata manager like Process Hacker (free an open source) i uploaded the data of a common app (in my case it was github desktop setup) and the AVs went from 10 to 1 in an instant, and for the first time Bitdefender didn't flag it as suspicious 😀!!! The file went from a few kilobytes to like 100mb tho so i think i'll have to work on that, maybe by embedding only the essential metadata and certificates.
+Both codes are undetected by Windows defender. The remote injection exe on virustotal got 10 detections, but using a simple certificate and metadata manager like Process Hacker (free an open source) i uploaded the data of a common app (in my case it was github desktop setup) and the AVs detections went from 10 to 1 in an instant, and for the first time Bitdefender didn't flag it as suspicious 😀!!! The file went from a few kilobytes to like 10mb tho so i think i'll have to work on that, maybe by embedding only the essential metadata and certificates.
 
 
 <img align="left" src="media/av4.png" width="440" />
