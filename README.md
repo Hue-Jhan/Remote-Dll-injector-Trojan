@@ -44,6 +44,11 @@ The remote injection dumps the dynamic library into disk (might get detected tho
 - Then we get the base address of kernel32 dll to get the pointer of the function which will load the malicious library;
 - Finally we create a thread that executes the function that loads the malicious dll;
 
+### 3) Reverse shell
+
+The actual dll contains the encrypted shellcode with the reverse shell, here's how it works:
+- First the ...
+
 
 # 🛡 Obfuscation and AV Detection 
 
