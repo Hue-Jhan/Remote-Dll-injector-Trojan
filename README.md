@@ -1,5 +1,6 @@
 # Remote Dll injector Trojan
-Undetected trojan using dll injection of a custom library that spawns a shell on a target machine, undetected by Windows defender and Bitdefener
+Undetected trojan using dll injection of a custom library that spawns a shell on a target machine, undetected by Windows defender and Bitdefener.
+This code is for educational purposes only, do not use it for any malicious or unauthorized activity.
 
 # 💻 Code
 
