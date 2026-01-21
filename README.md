@@ -1,5 +1,5 @@
 # Remote Dll injector Trojan
-Undetected trojan using dll injection of a custom library that spawns a shell on a target machine, undetected by Windows defender. This code is for educational purposes only, do not use it for any malicious or unauthorized activity.
+Simple dll injector trojan  of a custom dll that spawns a shell on a target machine. This code is for educational purposes only, do not use it for any malicious or unauthorized activity.
 
 # 💻 Code
 
@@ -45,6 +45,6 @@ Extracting the dll and uploading to disk is risky tho, in the future i will find
 
 <img align="right" src="media/av1.png" width="340" />
 
-Both codes are undetected by Windows defender. The remote injection exe on virustotal got 10 detections, but using a simple certificate and metadata manager like Process Hacker (free an open source) i uploaded the data of a common app (in my case it was github desktop setup) and the AVs detections went from 10 to 1 in an instant, and for the first time Bitdefender didn't flag it as suspicious 😀!!! The file went from a few kilobytes to like 10mb tho so i think i'll have to work on that, maybe by embedding only the essential metadata and certificates.
+Both codes are detected and stopped by Windows defender. The remote injection exe on virustotal got 10 detections, but using a simple certificate and metadata manager like Process Hacker (free an open source) i uploaded the data of a common app (in my case it was github desktop setup) and the AVs detections went from 10 to 1 in an instant.
 
 <img align="left" src="media/av4.png" width="540" />
